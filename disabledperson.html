@@ -1,0 +1,415 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>장애인기업 등록 현황 EDA 분석 보고서</title>
+  <style>
+    :root{
+  /* 🌱 밝은 연두색 교육용 테마 */
+  --bg:#f3f9f1;          /* 전체 배경 */
+  --card:#ffffff;       /* 카드 배경 */
+  --card2:#ecf7ea;      /* 카드 강조 배경 */
+
+  --text:#1f2933;       /* 기본 텍스트 */
+  --muted:#6b7280;      /* 보조 텍스트 */
+
+  --line:#d9ead3;       /* 구분선 */
+
+  --accent:#65a30d;     /* 메인 연두 */
+  --accent2:#22c55e;    /* 포인트 초록 */
+
+  --good:#4ade80;
+  --warn:#facc15;
+  --bad:#fb7185;
+
+  --shadow: 0 8px 20px rgba(0,0,0,.05);
+  --radius: 18px;
+  --radius2: 28px;
+}
+    *{box-sizing:border-box;}
+    body{
+  margin:0;
+  font-family: ui-sans-serif, system-ui, -apple-system, "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", Segoe UI, Roboto, Helvetica, Arial, "Segoe UI Emoji";
+  color: var(--text);
+  background:#f4fbf2; /* 전체 배경: 아주 연한 연두 */
+  line-height:1.55;
+}
+    a{color:inherit;}
+    .wrap{max-width:1100px; margin:0 auto; padding:28px 18px 72px;}
+
+    /* Header */
+    .hero{
+  display:grid;
+  gap:18px;
+  padding:26px;
+  border:1px solid #cde8c7;
+  border-radius:var(--radius2);
+  background: linear-gradient(180deg, #e9f7e6, #f3f9f1);
+  box-shadow: var(--shadow);
+}
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      width:max-content;
+      padding:7px 11px;
+      border-radius:999px;
+      border:1px solid rgba(122,162,255,.35);
+      background: rgba(122,162,255,.12);
+      color: var(--muted);
+      font-size:13px;
+      letter-spacing:.2px;
+    }
+    .hero h1{margin:0; font-size:28px; line-height:1.25;}
+    .subtitle{margin:0; color:var(--muted); font-size:14.5px; max-width:70ch;}
+    .meta{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin-top:6px;
+    }
+    .chip{
+      padding:8px 10px;
+      border-radius:999px;
+      border:1px solid rgba(174,183,222,.18);
+      background: rgba(255,255,255,.04);
+      color:var(--muted);
+      font-size:13px;
+    }
+    .chip b{color:var(--text); font-weight:650;}
+
+    /* Layout */
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:16px;
+      margin-top:18px;
+    }
+    @media (min-width: 980px){
+      .grid{grid-template-columns: 340px 1fr; align-items:start;}
+    }
+
+    /* Sidebar */
+    .side{
+  position:sticky;
+  top:18px;
+  border-radius:var(--radius);
+  border:1px solid #d6ecd1;
+  background:#f9fdf8; /* 사이드바도 동일 톤 */
+  box-shadow: var(--shadow);
+  overflow:hidden;
+}
+    .side .head{
+      padding:16px 16px 12px;
+      border-bottom:1px solid var(--line);
+      background: rgba(255,255,255,.03);
+    }
+    .side h2{margin:0; font-size:15px;}
+    .side p{margin:6px 0 0; color:var(--muted); font-size:13px;}
+    nav{padding:10px 10px 14px;}
+    .nav a{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      padding:10px 12px;
+      margin:6px 0;
+      text-decoration:none;
+      border-radius:14px;
+      color:var(--text);
+      border:1px solid transparent;
+      background: rgba(255,255,255,.03);
+    }
+    .nav a:hover{border-color: rgba(122,162,255,.35); background: rgba(122,162,255,.10);}
+    .nav small{color:var(--muted); font-size:12px;}
+
+    /* Main */
+    .card{
+  border-radius:var(--radius);
+  border:1px solid #d6ecd1;
+  background:#f9fdf8; /* 카드도 연한 연두 */
+  box-shadow: var(--shadow);
+  overflow:hidden;
+}
+    .card .section{
+      padding:18px 18px 16px;
+      border-top:1px solid rgba(35,48,90,.65);
+    }
+    .card .section:first-child{border-top:none;}
+
+    h3{margin:0 0 10px; font-size:18px;}
+    h4{margin:14px 0 8px; font-size:15px; color:var(--text);}
+    .muted{color:var(--muted);}
+
+    .kpi{
+      display:grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap:10px;
+      margin-top:10px;
+    }
+    @media (min-width: 720px){
+      .kpi{grid-template-columns: repeat(4, minmax(0, 1fr));}
+    }
+    .kpi .box{
+      padding:12px 12px;
+      border-radius:16px;
+      border:1px solid rgba(174,183,222,.16);
+      background: rgba(255,255,255,.04);
+    }
+    .kpi .box .label{color:var(--muted); font-size:12px;}
+    .kpi .box .value{font-size:18px; font-weight:750; margin-top:4px;}
+
+    .callout{
+  margin-top:10px;
+  padding:12px 12px;
+  border-radius:16px;
+  border:1px solid #86efac;
+  background:#ecfdf3;
+  color:#14532d;
+}
+    .callout b{color: var(--accent2);}
+
+    /* Tables */
+    table{
+  width:100%;
+  border-collapse:separate;
+  border-spacing:0;
+  margin-top:10px;
+  overflow:hidden;
+  border-radius:16px;
+  border:1px solid #d6ecd1;
+  background:#f9fdf8; /* 표 배경 연두 */
+}
+    th, td{
+      padding:10px 10px;
+      text-align:left;
+      border-bottom:1px solid rgba(174,183,222,.10);
+      font-size:13.5px;
+    }
+    th{color: var(--muted); font-weight:650; background: rgba(255,255,255,.03);}
+    tr:last-child td{border-bottom:none;}
+    td.num{text-align:right; font-variant-numeric: tabular-nums;}
+
+    /* Lists */
+    ul{margin:10px 0 0 18px; padding:0;}
+    li{margin:6px 0;}
+
+    /* Footer */
+    footer{
+      margin-top:16px;
+      padding:14px 16px;
+      color: var(--muted);
+      font-size:12.5px;
+      border:1px dashed rgba(174,183,222,.18);
+      border-radius:16px;
+      background: rgba(255,255,255,.02);
+    }
+
+    .pillrow{display:flex; flex-wrap:wrap; gap:8px; margin-top:10px;}
+    .pill{
+      padding:7px 10px;
+      border-radius:999px;
+      border:1px solid rgba(174,183,222,.16);
+      background: rgba(255,255,255,.03);
+      color: var(--muted);
+      font-size:12.5px;
+    }
+
+    $1
+    /* Charts */
+    figure.chart{
+      margin:12px 0 0;
+      padding:12px;
+      border-radius:16px;
+      border:1px solid #d6ecd1;
+      background:#f9fdf8;
+    }
+    figure.chart img{max-width:100%; height:auto; display:block; border-radius:12px;}
+    figure.chart figcaption{margin-top:8px; color:var(--muted); font-size:12.5px;}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="hero">
+      <div class="badge">📌 EDA 보고서 · 장애인기업 등록 현황</div>
+      <h1>장애인기업 등록 현황 데이터 분석 보고서</h1>
+      <p class="subtitle">업로드된 CSV 데이터를 기반으로 장애인기업의 <b>산업(주업종)</b> 분포와 <b>지역(광역)</b> 분포를 파악하고, 지역×산업의 관계를 교차 분석하여 정책·연구 활용 관점의 시사점을 도출했습니다.</p>
+      <div class="meta">
+        <div class="chip">데이터 건수 <b>7,634</b></div>
+        <div class="chip">변수 <b>6</b></div>
+        <div class="chip">결측치 <b>없음</b></div>
+        <div class="chip">분석 범위 <b>일변량/다변량</b></div>
+      </div>
+    </header>
+
+    <div class="grid">
+      <aside class="side">
+        <div class="head">
+          <h2>목차</h2>
+          <p>클릭하면 해당 섹션으로 이동합니다.</p>
+        </div>
+        <nav class="nav">
+          <a href="#overview"><span>1. 분석 개요</span><small>목적·범위</small></a>
+          <a href="#data"><span>2. 데이터 개요</span><small>구조·품질</small></a>
+          <a href="#uni"><span>3. 일변량 분석</span><small>주업종·지역</small></a>
+          <a href="#multi"><span>4. 다변량 분석</span><small>교차·다양도</small></a>
+          <a href="#insights"><span>5. 종합 시사점</span><small>해석·활용</small></a>
+          <a href="#next"><span>6. 향후 확장</span><small>고도화</small></a>
+        </nav>
+      </aside>
+
+      <main class="card">
+        <section id="overview" class="section">
+          <h3>1. 분석 개요</h3>
+          <p class="muted">본 보고서는 「장애인기업 등록 현황」 데이터로 장애인기업의 산업 및 지역적 특성을 파악하기 위한 탐색적 데이터 분석(EDA) 결과를 정리한 것입니다. 비시각화·시각화 분석을 병행하여 데이터 구조를 이해하고 정책·연구 활용 가능성을 도출했습니다.</p>
+          <div class="pillrow">
+            <span class="pill">분석 방식: 비시각화 EDA + 시각화 EDA</span>
+            <span class="pill">주요 관점: 주업종 분포, 광역 분포, 업종×지역 교차, 지역별 업종 다양도</span>
+          </div>
+        </section>
+
+        <section id="data" class="section">
+          <h3>2. 데이터 개요</h3>
+          <div class="kpi">
+            <div class="box"><div class="label">기업 수</div><div class="value">7,634</div></div>
+            <div class="box"><div class="label">컬럼 수</div><div class="value">6</div></div>
+            <div class="box"><div class="label">주업종 종류 수</div><div class="value">795</div></div>
+            <div class="box"><div class="label">소재지(주소) 고유값</div><div class="value">7,593</div></div>
+          </div>
+          <div class="callout">
+            <b>데이터 품질 요약</b> · 전 컬럼 결측치가 없으며, 대부분이 범주형(텍스트) 변수로 구성되어 있습니다. <b>사업자등록번호</b>는 식별자 성격이므로 통계 분석 대상에서 제외하는 것이 적절합니다.
+          </div>
+          <h4>변수 목록</h4>
+          <ul>
+            <li><b>업체명</b>: 기업명</li>
+            <li><b>사업자등록번호</b>: 식별자(ID) 성격</li>
+            <li><b>주업종</b>: 산업 분류(텍스트)</li>
+            <li><b>주요 생산품목</b>: 비정형 텍스트(품목/서비스)</li>
+            <li><b>소재지</b>: 상세 주소(광역 단위 파생 가능)</li>
+            <li><b>전화번호</b>: 연락처(분석 목적에 따라 마스킹/제외 권장)</li>
+          </ul>
+        </section>
+
+        <section id="uni" class="section">
+          <h3>3. 일변량 분석(요약)</h3>
+          <p class="muted">각 변수의 단독 분포를 점검하여 데이터의 전체 구조를 이해했습니다.</p>
+
+          <h4>3.1 주업종 상위 분포</h4>
+          <table>
+            <thead>
+              <tr><th>순위</th><th>주업종</th><th class="num">기업 수</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>1</td><td>건설업</td><td class="num">1,425</td></tr>
+              <tr><td>2</td><td>제조업</td><td class="num">1,125</td></tr>
+              <tr><td>3</td><td>도매 및 소매업</td><td class="num">1,015</td></tr>
+              <tr><td>4</td><td>전문 과학 및 기술 서비스업</td><td class="num">173</td></tr>
+              <tr><td>5</td><td>사업시설관리 및 사업지원 서비스업</td><td class="num">140</td></tr>
+            </tbody>
+          </table>
+          <div class="callout">해석: 장애인기업은 <b>건설·제조·유통</b> 중심으로 분포하며, 상위 업종에 집중되는 <b>산업 편중</b>이 확인됩니다.</div>
+
+          <h4>3.2 광역(소재지) 상위 분포</h4>
+          <table>
+            <thead>
+              <tr><th>순위</th><th>광역 지역</th><th class="num">기업 수</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>1</td><td>경기도</td><td class="num">1,859</td></tr>
+              <tr><td>2</td><td>서울특별시</td><td class="num">1,020</td></tr>
+              <tr><td>3</td><td>경상북도</td><td class="num">540</td></tr>
+              <tr><td>4</td><td>경상남도</td><td class="num">413</td></tr>
+              <tr><td>5</td><td>전라남도</td><td class="num">400</td></tr>
+            </tbody>
+          </table>
+          <div class="callout">해석: <b>수도권(경기·서울)</b> 집중이 뚜렷하지만, 경상권·전라권 등 비수도권에도 의미 있는 분포가 존재합니다.</div>
+
+          <div class="hr"></div>
+          <p class="muted">$1
+
+          <figure class="chart">
+            <img alt="주업종 상위 10개 분포 차트" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABKAAAAL/CAYAAABV6tZQAAAAOXRFWHRTb2Z0d2FyZQBNYXRwbG90bGliIHZlcnNpb24zLjEwLjUsIGh0dHBzOi8vbWF0cGxvdGxpYi5vcmcvWftoOwAAAAlwSFlzAAAPYQAAD2EBqD+naQAAxnxJREFUeJzs3Xl8VFX9x/H3zGQmScjAQBJCIAgqFUEUExE7dVHQrVvFbW1b29rW0vqq3r2q9uVt7bK2Vbq2bVulKq2tVdRFxQRFxGkQwQGSEAmZkJkQy5n9+Hf3w5yQmZkJkXv0+H8eY9w7mZ2fO+fM+Z7zvOeH3+V0AAAAAAACg6x4xWwAAAAAAALC2CwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAAAAAAAAyAMAAAAAAADIAwAAAAAAAMgDAA" />
+            <figcaption>그림 1. 주업종 상위 10개 분포(기업 수 기준)</figcaption>
+          </figure>
+
+          <figure class="chart">
+            <img alt="광역 소재지 상위 10개 분포 차트" src="data:image/png;base64,REPLACE_TOP_REGION" />
+            <figcaption>그림 2. 광역 소재지 상위 10개 분포(기업 수 기준)</figcaption>
+          </figure>
+        </section>
+
+        <section id="multi" class="section">
+          <h3>4. 다변량 분석(요약)</h3>
+          <p class="muted">변수 간 관계를 통해 지역·산업 구조의 차이를 파악했습니다.</p>
+
+          <h4>4.1 주업종 × 광역지역(상위 기준) 교차</h4>
+          <table>
+            <thead>
+              <tr>
+                <th>주업종 \ 지역</th>
+                <th class="num">경기도</th>
+                <th class="num">서울특별시</th>
+                <th class="num">경상북도</th>
+                <th class="num">경상남도</th>
+                <th class="num">전라남도</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>건설업</td><td class="num">315</td><td class="num">126</td><td class="num">121</td><td class="num">80</td><td class="num">101</td></tr>
+              <tr><td>제조업</td><td class="num">339</td><td class="num">89</td><td class="num">108</td><td class="num">74</td><td class="num">38</td></tr>
+              <tr><td>도매 및 소매업</td><td class="num">232</td><td class="num">152</td><td class="num">54</td><td class="num">41</td><td class="num">48</td></tr>
+              <tr><td>전문 과학 및 기술 서비스업</td><td class="num">29</td><td class="num">34</td><td class="num">10</td><td class="num">3</td><td class="num">8</td></tr>
+              <tr><td>사업시설관리 및 사업지원 서비스업</td><td class="num">26</td><td class="num">23</td><td class="num">7</td><td class="num">3</td><td class="num">7</td></tr>
+            </tbody>
+          </table>
+          $1
+
+          <figure class="chart">
+            <img alt="주업종×광역지역 분포 차트" src="data:image/png;base64,REPLACE_INDUSTRY_X_REGION" />
+            <figcaption>그림 3. 주업종 × 광역지역 분포(상위 업종·지역 기준)</figcaption>
+          </figure>
+
+          <h4>4.2 지역별 업종 다양도(주업종 종류 수) 해석</h4>
+          <ul>
+            <li>경기도와 서울특별시는 <b>업종 다양도</b>가 높아 산업 포트폴리오가 넓은 편입니다.</li>
+            <li>기타 지역은 상대적으로 특정 산업군(제조·건설 등)에 <b>특화</b>되는 경향이 관찰됩니다.</li>
+          </ul>
+          $1
+
+          <figure class="chart">
+            <img alt="광역별 업종 다양도 차트" src="data:image/png;base64,REPLACE_DIVERSITY" />
+            <figcaption>그림 4. 광역별 업종 다양도(주업종 종류 수, 상위 10개)</figcaption>
+          </figure>
+        </section>
+
+        <section id="insights" class="section">
+          <h3>5. 종합 해석 및 시사점</h3>
+          <ul>
+            <li><b>산업 구조</b>: 장애인기업은 건설·제조·유통 중심의 구조를 보이며 상위 업종 집중도가 높습니다.</li>
+            <li><b>지역 구조</b>: 수도권 집중이 뚜렷하지만, 제조·건설은 비수도권에서도 의미 있는 분산을 보입니다.</li>
+            <li><b>정책 설계</b>: 지역별 업종 구성과 다양도가 달라 <b>지역×업종</b> 단위의 세분화된 지원 설계가 중요합니다.</li>
+            <li><b>데이터 확장성</b>: ‘주요 생산품목’은 비정형 텍스트이므로 표준 카테고리화/클러스터링을 통해 정교한 산업 분류가 가능합니다.</li>
+          </ul>
+          <div class="callout">
+            한 줄 요약: <b>수도권은 다양·집중, 비수도권은 제조·건설 중심 특화</b> — 지역별로 다른 지원 전략이 필요합니다.
+          </div>
+        </section>
+
+        <section id="next" class="section">
+          <h3>6. 향후 분석 확장 방향</h3>
+          <ul>
+            <li><b>주요 생산품목</b> 텍스트 전처리 및 클러스터링(키워드 기반 분류/TF-IDF 등)</li>
+            <li>광역 내 <b>세부 시군구</b> 레벨로 공간 분석 고도화</li>
+            <li>외부 데이터(인구/산업단지/지원사업) 결합을 통한 설명력 강화</li>
+            <li>정책 보고서용 <b>요약 지표·차트</b> 자동 생성 템플릿화</li>
+          </ul>
+          <footer>
+            ※ 본 웹페이지는 단일 HTML 파일에 CSS를 포함한 형태입니다. 필요하면 <code>style</code> 태그의 내용을 별도 <code>styles.css</code> 파일로 분리해(HTML에서 <code>&lt;link rel="stylesheet" href="styles.css"&gt;</code>로 연결) 운영할 수 있습니다.
+          </footer>
+        </section>
+      </main>
+    </div>
+  </div>
+</body>
+</html>
